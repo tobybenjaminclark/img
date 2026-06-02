@@ -35,14 +35,14 @@ select {
 
 .app-shell {
   display: grid;
-  grid-template-columns: minmax(320px, 390px) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
   gap: 24px;
   width: min(1440px, calc(100% - 32px));
   min-height: calc(100vh - 32px);
   margin: 16px auto;
 }
 
-.tool-panel,
+.app-header,
 .preview-card {
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.86);
@@ -50,15 +50,20 @@ select {
   backdrop-filter: blur(20px);
 }
 
-.tool-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+.app-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "brand actions"
+    "controls controls";
+  align-items: center;
+  gap: 22px 24px;
   padding: 24px;
   border-radius: 8px;
 }
 
 .brand {
+  grid-area: brand;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -86,73 +91,18 @@ h2 {
 }
 
 h1 {
-  max-width: 12ch;
-  font-size: clamp(2.1rem, 4vw, 3.8rem);
+  font-size: clamp(2rem, 3.2vw, 3.4rem);
 }
 
 h2 {
   font-size: 1rem;
 }
 
-.drop-zone {
-  display: grid;
-  place-items: center;
-  min-height: 190px;
-  padding: 24px;
-  border: 2px dashed rgba(34, 108, 95, 0.44);
-  border-radius: 8px;
-  background:
-    linear-gradient(135deg, rgba(95, 184, 137, 0.16), rgba(240, 200, 90, 0.14)),
-    #fbfdf8;
-  cursor: pointer;
-  text-align: center;
-  transition: border-color 180ms ease, transform 180ms ease, background 180ms ease;
-}
-
-.drop-zone:hover,
-.drop-zone.is-dragging {
-  border-color: var(--forest);
-  transform: translateY(-2px);
-  background:
-    linear-gradient(135deg, rgba(95, 184, 137, 0.24), rgba(240, 200, 90, 0.2)),
-    #ffffff;
-}
-
-.drop-zone input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-}
-
-.drop-icon {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  margin-bottom: 14px;
-  border-radius: 999px;
-  color: white;
-  font-size: 2rem;
-  font-weight: 600;
-  background: var(--forest);
-}
-
-.drop-title {
-  display: block;
-  font-size: 1.25rem;
-  font-weight: 700;
-}
-
-.drop-meta {
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
 .controls {
+  grid-area: controls;
   display: grid;
-  gap: 18px;
+  grid-template-columns: minmax(300px, 1fr) minmax(280px, 0.9fr);
+  gap: 24px;
 }
 
 fieldset {
@@ -170,12 +120,14 @@ legend {
 
 .corner-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(4, minmax(82px, 1fr));
+  align-items: start;
   gap: 10px;
 }
 
 label {
   display: grid;
+  align-content: start;
   gap: 7px;
   color: var(--muted);
   font-size: 0.86rem;
@@ -196,6 +148,7 @@ select {
 input:focus,
 select:focus,
 button:focus-visible,
+.upload-button:focus-within,
 .download-button:focus-visible {
   outline: 3px solid rgba(95, 184, 137, 0.35);
   outline-offset: 2px;
@@ -212,14 +165,29 @@ button:focus-visible,
   gap: 12px;
 }
 
-.actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+.checkbox-field {
+  display: flex;
+  align-items: center;
   gap: 10px;
-  margin-top: auto;
+  min-height: 42px;
+  color: var(--ink);
+}
+
+.checkbox-field input {
+  width: 20px;
+  min-height: 20px;
+  accent-color: var(--forest);
+}
+
+.header-actions {
+  grid-area: actions;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(130px, auto));
+  gap: 10px;
 }
 
 button,
+.upload-button,
 .download-button {
   display: inline-grid;
   place-items: center;
@@ -241,6 +209,31 @@ button {
   background: var(--forest);
 }
 
+.upload-button {
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  color: white;
+  background: var(--forest);
+}
+
+.upload-button input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.upload-button span {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  color: var(--forest);
+  background: white;
+}
+
 .download-button.is-disabled {
   pointer-events: none;
   opacity: 0.45;
@@ -255,7 +248,7 @@ button {
 
 .preview-card {
   display: grid;
-  grid-template-rows: auto minmax(360px, 1fr);
+  grid-template-rows: auto minmax(460px, 1fr);
   min-width: 0;
   border-radius: 8px;
   overflow: hidden;
@@ -282,8 +275,8 @@ button {
   position: relative;
   display: grid;
   place-items: center;
-  min-height: 360px;
-  padding: 18px;
+  min-height: 460px;
+  padding: 34px;
   overflow: hidden;
   background:
     linear-gradient(45deg, rgba(34, 108, 95, 0.08) 25%, transparent 25%),
@@ -301,9 +294,12 @@ button {
 .image-stage img {
   display: block;
   max-width: 100%;
-  max-height: calc(100vh - 150px);
+  max-height: calc(100vh - 260px);
   object-fit: contain;
-  filter: drop-shadow(0 18px 32px rgba(24, 35, 31, 0.2));
+}
+
+.generated-stage.has-drop-shadow img {
+  filter: drop-shadow(0 40px 32px rgba(56, 107, 74, 0.2));
 }
 
 .image-stage.empty img {
@@ -321,8 +317,21 @@ button {
 }
 
 @media (max-width: 980px) {
-  .app-shell {
+  .app-header {
     grid-template-columns: 1fr;
+    grid-template-areas:
+      "brand"
+      "controls"
+      "actions";
+    align-items: stretch;
+  }
+
+  .controls {
+    grid-template-columns: 1fr;
+  }
+
+  .corner-grid {
+    grid-template-columns: 1fr 1fr;
   }
 
   .preview-panel {
@@ -340,7 +349,7 @@ button {
     margin: 10px auto;
   }
 
-  .tool-panel {
+  .app-header {
     padding: 18px;
   }
 
@@ -350,7 +359,7 @@ button {
   }
 
   .corner-grid,
-  .actions {
+  .header-actions {
     grid-template-columns: 1fr;
   }
 

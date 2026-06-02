@@ -13,7 +13,7 @@
   </head>
   <body>
     <main class="app-shell">
-      <section class="tool-panel" aria-label="Image controls">
+      <header class="app-header">
         <div class="brand">
           <img src="assets/icon.svg" alt="" class="brand-icon">
           <div>
@@ -21,13 +21,6 @@
             <h1>BNG Image Styler</h1>
           </div>
         </div>
-
-        <label class="drop-zone" for="imageInput">
-          <input id="imageInput" type="file" accept="image/*">
-          <span class="drop-icon" aria-hidden="true">+</span>
-          <span class="drop-title">Upload image</span>
-          <span class="drop-meta">PNG, JPEG, WebP, SVG, GIF</span>
-        </label>
 
         <div class="controls">
           <fieldset>
@@ -70,14 +63,23 @@
                 <option value="image/png">PNG</option>
               </select>
             </label>
+            <label class="checkbox-field">
+              <input id="dropShadow" type="checkbox">
+              <span>Drop shadow</span>
+            </label>
           </fieldset>
         </div>
 
-        <div class="actions">
+        <div class="header-actions">
+          <label class="upload-button" for="imageInput">
+            <input id="imageInput" type="file" accept="image/*">
+            <span aria-hidden="true">+</span>
+            Upload image
+          </label>
           <button id="resetButton" type="button">Reset</button>
           <a id="downloadButton" class="download-button is-disabled" aria-disabled="true" download="bng-image-styler.webp">Download</a>
         </div>
-      </section>
+      </header>
 
       <section class="preview-panel" aria-label="Image previews">
         <div class="preview-card">

@@ -7,7 +7,6 @@ const state = {
 
 const elements = {
   imageInput: document.querySelector("#imageInput"),
-  dropZone: document.querySelector(".drop-zone"),
   sourcePreview: document.querySelector("#sourcePreview"),
   outputPreview: document.querySelector("#outputPreview"),
   sourceStage: document.querySelector("#sourceStage"),
@@ -18,6 +17,7 @@ const elements = {
   qualityOutput: document.querySelector("#qualityOutput"),
   maxWidth: document.querySelector("#maxWidth"),
   format: document.querySelector("#format"),
+  dropShadow: document.querySelector("#dropShadow"),
   downloadButton: document.querySelector("#downloadButton"),
   resetButton: document.querySelector("#resetButton"),
   canvas: document.querySelector("#workCanvas"),
@@ -63,6 +63,7 @@ function getSettings() {
     quality: Number(elements.quality.value) / 100,
     maxWidth: Math.max(160, readNumber(elements.maxWidth, 1600)),
     format: elements.format.value,
+    dropShadow: elements.dropShadow.checked,
     radii: {
       topLeft: readNumber(elements.radii.topLeft, 80),
       topRight: readNumber(elements.radii.topRight, 20),
@@ -91,10 +92,15 @@ function makeRoundedPath(context, width, height, radii) {
   context.closePath();
 }
 
+function syncDropShadow() {
+  elements.outputStage.classList.toggle("has-drop-shadow", elements.dropShadow.checked);
+}
+
 function drawStyledImage() {
   if (!state.image) return;
 
   const settings = getSettings();
+  syncDropShadow();
   const sourceWidth = state.image.naturalWidth;
   const sourceHeight = state.image.naturalHeight;
   const scale = Math.min(1, settings.maxWidth / sourceWidth);
@@ -174,27 +180,14 @@ function resetControls() {
   elements.quality.value = 82;
   elements.maxWidth.value = 1600;
   elements.format.value = "image/webp";
+  elements.dropShadow.checked = false;
   elements.qualityOutput.textContent = "82%";
+  syncDropShadow();
   drawStyledImage();
 }
 
 elements.imageInput.addEventListener("change", (event) => {
   loadFile(event.target.files?.[0]);
-});
-
-elements.dropZone.addEventListener("dragover", (event) => {
-  event.preventDefault();
-  elements.dropZone.classList.add("is-dragging");
-});
-
-elements.dropZone.addEventListener("dragleave", () => {
-  elements.dropZone.classList.remove("is-dragging");
-});
-
-elements.dropZone.addEventListener("drop", (event) => {
-  event.preventDefault();
-  elements.dropZone.classList.remove("is-dragging");
-  loadFile(event.dataTransfer.files?.[0]);
 });
 
 [
@@ -205,6 +198,7 @@ elements.dropZone.addEventListener("drop", (event) => {
   elements.radii.topRight,
   elements.radii.bottomLeft,
   elements.radii.bottomRight,
+  elements.dropShadow,
 ].forEach((control) => {
   control.addEventListener("input", () => {
     elements.qualityOutput.textContent = `${elements.quality.value}%`;
