@@ -61,6 +61,14 @@ function extensionForFormat(format) {
   return "webp";
 }
 
+function getSourceWidth(source) {
+  return source.naturalWidth || source.width;
+}
+
+function getSourceHeight(source) {
+  return source.naturalHeight || source.height;
+}
+
 function getSettings() {
   return {
     quality: Number(elements.quality.value) / 100,
@@ -111,8 +119,8 @@ function drawStyledImage() {
 
   const settings = getSettings();
   syncDropShadow();
-  const sourceWidth = state.image.naturalWidth;
-  const sourceHeight = state.image.naturalHeight;
+  const sourceWidth = getSourceWidth(state.image);
+  const sourceHeight = getSourceHeight(state.image);
   const scale = Math.min(1, settings.maxWidth / sourceWidth);
   const outputWidth = Math.round(sourceWidth * scale);
   const outputHeight = Math.round(sourceHeight * scale);
@@ -156,14 +164,95 @@ function drawStyledImage() {
   );
 }
 
+function isTiffBuffer(buffer) {
+  const bytes = new Uint8Array(buffer, 0, Math.min(buffer.byteLength, 4));
+  const littleEndianTiff = bytes[0] === 0x49 && bytes[1] === 0x49 && bytes[2] === 0x2a && bytes[3] === 0x00;
+  const bigEndianTiff = bytes[0] === 0x4d && bytes[1] === 0x4d && bytes[2] === 0x00 && bytes[3] === 0x2a;
+  return littleEndianTiff || bigEndianTiff;
+}
+
+function decodeTiffToCanvas(buffer) {
+  if (!window.UTIF) {
+    throw new Error("TIFF decoder is unavailable");
+  }
+
+  const ifds = UTIF.decode(buffer);
+  const imageDirectory = ifds[0];
+
+  if (!imageDirectory) {
+    throw new Error("No TIFF image data found");
+  }
+
+  UTIF.decodeImage(buffer, imageDirectory);
+  const rgba = UTIF.toRGBA8(imageDirectory);
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+
+  canvas.width = imageDirectory.width;
+  canvas.height = imageDirectory.height;
+  context.putImageData(new ImageData(new Uint8ClampedArray(rgba), canvas.width, canvas.height), 0, 0);
+
+  return canvas;
+}
+
+async function createPreviewUrl(source, maxWidth = 2400) {
+  const width = getSourceWidth(source);
+  const height = getSourceHeight(source);
+  const scale = Math.min(1, maxWidth / width);
+  const previewCanvas = document.createElement("canvas");
+  const context = previewCanvas.getContext("2d");
+
+  previewCanvas.width = Math.round(width * scale);
+  previewCanvas.height = Math.round(height * scale);
+  context.drawImage(source, 0, 0, previewCanvas.width, previewCanvas.height);
+
+  return new Promise((resolve, reject) => {
+    previewCanvas.toBlob((blob) => {
+      if (!blob) {
+        reject(new Error("Could not create TIFF preview"));
+        return;
+      }
+
+      resolve(URL.createObjectURL(blob));
+    }, "image/jpeg", 0.88);
+  });
+}
+
+async function loadDecodedTiff(file, buffer) {
+  const canvas = decodeTiffToCanvas(buffer);
+  URL.revokeObjectURL(state.sourceUrl);
+  state.sourceUrl = await createPreviewUrl(canvas);
+  state.image = canvas;
+  showPreviews();
+  elements.sourcePreview.src = state.sourceUrl;
+  elements.sourceStage.classList.remove("empty");
+  elements.outputStage.classList.add("empty");
+  elements.sourceMeta.textContent = `${canvas.width} x ${canvas.height} · ${formatBytes(file.size)} · TIFF`;
+  elements.outputMeta.textContent = "Generating";
+  drawStyledImage();
+}
+
+function resetDownload() {
+  elements.downloadButton.removeAttribute("href");
+  elements.downloadButton.classList.add("is-disabled");
+  elements.downloadButton.setAttribute("aria-disabled", "true");
+}
+
+function setLoadError(message) {
+  elements.sourceMeta.textContent = message;
+  elements.outputMeta.textContent = "Waiting";
+  resetDownload();
+}
+
 function loadFile(file) {
-  if (!file || !file.type.startsWith("image/")) return;
+  if (!file || (!file.type.startsWith("image/") && !/\.(tif|tiff)$/i.test(file.name))) return;
 
   URL.revokeObjectURL(state.sourceUrl);
   URL.revokeObjectURL(state.outputUrl);
   state.sourceFile = file;
   state.sourceUrl = URL.createObjectURL(file);
   state.outputUrl = "";
+  resetDownload();
 
   const image = new Image();
   image.onload = () => {
@@ -176,9 +265,19 @@ function loadFile(file) {
     elements.outputMeta.textContent = "Generating";
     drawStyledImage();
   };
-  image.onerror = () => {
-    elements.sourceMeta.textContent = "Could not load image";
-    elements.outputMeta.textContent = "Waiting";
+  image.onerror = async () => {
+    try {
+      const buffer = await file.arrayBuffer();
+      if (!isTiffBuffer(buffer)) {
+        setLoadError("Could not load image");
+        return;
+      }
+
+      await loadDecodedTiff(file, buffer);
+    } catch (error) {
+      console.error(error);
+      setLoadError("Could not decode TIFF image");
+    }
   };
   image.src = state.sourceUrl;
 }
