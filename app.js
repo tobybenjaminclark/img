@@ -78,8 +78,8 @@ function getSettings() {
     radii: {
       topLeft: readNumber(elements.radii.topLeft, 30),
       topRight: readNumber(elements.radii.topRight, 10),
-      bottomLeft: readNumber(elements.radii.bottomLeft, 30),
-      bottomRight: readNumber(elements.radii.bottomRight, 10),
+      bottomLeft: readNumber(elements.radii.bottomLeft, 10),
+      bottomRight: readNumber(elements.radii.bottomRight, 30),
     },
   };
 }
@@ -285,8 +285,8 @@ function loadFile(file) {
 function resetControls() {
   elements.radii.topLeft.value = 30;
   elements.radii.topRight.value = 10;
-  elements.radii.bottomLeft.value = 30;
-  elements.radii.bottomRight.value = 10;
+  elements.radii.bottomLeft.value = 10;
+  elements.radii.bottomRight.value = 30;
   elements.quality.value = 82;
   elements.maxWidth.value = 1600;
   elements.format.value = "image/webp";
