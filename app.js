@@ -51,7 +51,7 @@ function formatBytes(bytes) {
 }
 
 function readNumber(input, fallback) {
-  const value = Number.parseInt(input.value, 10);
+  const value = Number.parseFloat(input.value);
   return Number.isFinite(value) ? Math.max(0, value) : fallback;
 }
 
@@ -68,19 +68,21 @@ function getSettings() {
     format: elements.format.value,
     dropShadow: elements.dropShadow.checked,
     radii: {
-      topLeft: readNumber(elements.radii.topLeft, 80),
-      topRight: readNumber(elements.radii.topRight, 20),
-      bottomLeft: readNumber(elements.radii.bottomLeft, 20),
-      bottomRight: readNumber(elements.radii.bottomRight, 80),
+      topLeft: readNumber(elements.radii.topLeft, 30),
+      topRight: readNumber(elements.radii.topRight, 10),
+      bottomLeft: readNumber(elements.radii.bottomLeft, 30),
+      bottomRight: readNumber(elements.radii.bottomRight, 10),
     },
   };
 }
 
 function makeRoundedPath(context, width, height, radii) {
-  const topLeft = Math.min(radii.topLeft, width / 2, height / 2);
-  const topRight = Math.min(radii.topRight, width / 2, height / 2);
-  const bottomLeft = Math.min(radii.bottomLeft, width / 2, height / 2);
-  const bottomRight = Math.min(radii.bottomRight, width / 2, height / 2);
+  const radiusBasis = Math.min(width, height);
+  const percentageToPixels = (percentage) => radiusBasis * Math.min(percentage, 50) / 100;
+  const topLeft = percentageToPixels(radii.topLeft);
+  const topRight = percentageToPixels(radii.topRight);
+  const bottomLeft = percentageToPixels(radii.bottomLeft);
+  const bottomRight = percentageToPixels(radii.bottomRight);
 
   context.beginPath();
   context.moveTo(topLeft, 0);
@@ -182,10 +184,10 @@ function loadFile(file) {
 }
 
 function resetControls() {
-  elements.radii.topLeft.value = 80;
-  elements.radii.topRight.value = 20;
-  elements.radii.bottomLeft.value = 20;
-  elements.radii.bottomRight.value = 80;
+  elements.radii.topLeft.value = 30;
+  elements.radii.topRight.value = 10;
+  elements.radii.bottomLeft.value = 30;
+  elements.radii.bottomRight.value = 10;
   elements.quality.value = 82;
   elements.maxWidth.value = 1600;
   elements.format.value = "image/webp";

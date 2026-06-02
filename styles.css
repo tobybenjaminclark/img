@@ -191,13 +191,16 @@ button:focus-visible,
 button,
 .upload-button,
 .download-button {
-  display: inline-grid;
-  place-items: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 46px;
   border: 1px solid var(--forest);
   border-radius: 6px;
+  padding: 0 18px 1px;
   text-decoration: none;
   font-weight: 700;
+  line-height: 1;
   cursor: pointer;
 }
 
