@@ -107,6 +107,7 @@ h2 {
 
 fieldset {
   display: grid;
+  align-content: start;
   gap: 14px;
   margin: 0;
   padding: 0;
@@ -120,9 +121,10 @@ legend {
 
 .corner-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(82px, 1fr));
+  grid-template-columns: repeat(2, minmax(120px, 1fr));
   align-items: start;
   gap: 10px;
+  max-width: 520px;
 }
 
 label {
@@ -210,8 +212,6 @@ button {
 }
 
 .upload-button {
-  grid-template-columns: auto 1fr;
-  gap: 8px;
   color: white;
   background: var(--forest);
 }
@@ -224,19 +224,67 @@ button {
   clip: rect(0 0 0 0);
 }
 
-.upload-button span {
-  display: grid;
-  place-items: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 999px;
-  color: var(--forest);
-  background: white;
-}
-
 .download-button.is-disabled {
   pointer-events: none;
   opacity: 0.45;
+}
+
+.upload-start {
+  display: grid;
+  min-height: 520px;
+}
+
+.upload-start.is-hidden {
+  display: none;
+}
+
+.drop-zone {
+  display: grid;
+  place-items: center;
+  min-height: 100%;
+  padding: 34px;
+  border: 2px dashed rgba(34, 108, 95, 0.44);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(95, 184, 137, 0.16), rgba(240, 200, 90, 0.14)),
+    rgba(255, 255, 255, 0.78);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 180ms ease, transform 180ms ease, background 180ms ease;
+}
+
+.drop-zone:hover,
+.drop-zone.is-dragging {
+  border-color: var(--forest);
+  transform: translateY(-2px);
+  background:
+    linear-gradient(135deg, rgba(95, 184, 137, 0.24), rgba(240, 200, 90, 0.2)),
+    #ffffff;
+}
+
+.drop-icon {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  margin-bottom: 14px;
+  border-radius: 999px;
+  color: white;
+  font-size: 2.2rem;
+  font-weight: 600;
+  background: var(--forest);
+}
+
+.drop-title {
+  display: block;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.drop-meta {
+  color: var(--muted);
+  font-size: 0.95rem;
 }
 
 .preview-panel {
@@ -244,6 +292,10 @@ button {
   grid-template-columns: 1fr 1fr;
   gap: 24px;
   min-width: 0;
+}
+
+.preview-panel.is-hidden {
+  display: none;
 }
 
 .preview-card {
@@ -330,10 +382,6 @@ button {
     grid-template-columns: 1fr;
   }
 
-  .corner-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
   .preview-panel {
     grid-template-columns: 1fr;
   }
@@ -358,9 +406,12 @@ button {
     height: 56px;
   }
 
-  .corner-grid,
   .header-actions {
     grid-template-columns: 1fr;
+  }
+
+  .corner-grid {
+    grid-template-columns: 1fr 1fr;
   }
 
   .preview-heading {

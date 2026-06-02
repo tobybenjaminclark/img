@@ -64,7 +64,7 @@
               </select>
             </label>
             <label class="checkbox-field">
-              <input id="dropShadow" type="checkbox">
+              <input id="dropShadow" type="checkbox" checked>
               <span>Drop shadow</span>
             </label>
           </fieldset>
@@ -73,7 +73,6 @@
         <div class="header-actions">
           <label class="upload-button" for="imageInput">
             <input id="imageInput" type="file" accept="image/*">
-            <span aria-hidden="true">+</span>
             Upload image
           </label>
           <button id="resetButton" type="button">Reset</button>
@@ -81,7 +80,15 @@
         </div>
       </header>
 
-      <section class="preview-panel" aria-label="Image previews">
+      <section class="upload-start" id="uploadStart" aria-label="Upload image">
+        <label class="drop-zone" for="imageInput">
+          <span class="drop-icon" aria-hidden="true">+</span>
+          <span class="drop-title">Upload image</span>
+          <span class="drop-meta">PNG, JPEG, WebP, SVG, GIF</span>
+        </label>
+      </section>
+
+      <section class="preview-panel is-hidden" aria-label="Image previews">
         <div class="preview-card">
           <div class="preview-heading">
             <h2>Uploaded</h2>

@@ -7,6 +7,9 @@ const state = {
 
 const elements = {
   imageInput: document.querySelector("#imageInput"),
+  dropZone: document.querySelector(".drop-zone"),
+  uploadStart: document.querySelector("#uploadStart"),
+  previewPanel: document.querySelector(".preview-panel"),
   sourcePreview: document.querySelector("#sourcePreview"),
   outputPreview: document.querySelector("#outputPreview"),
   sourceStage: document.querySelector("#sourceStage"),
@@ -96,6 +99,11 @@ function syncDropShadow() {
   elements.outputStage.classList.toggle("has-drop-shadow", elements.dropShadow.checked);
 }
 
+function showPreviews() {
+  elements.uploadStart.classList.add("is-hidden");
+  elements.previewPanel.classList.remove("is-hidden");
+}
+
 function drawStyledImage() {
   if (!state.image) return;
 
@@ -158,6 +166,7 @@ function loadFile(file) {
   const image = new Image();
   image.onload = () => {
     state.image = image;
+    showPreviews();
     elements.sourcePreview.src = state.sourceUrl;
     elements.sourceStage.classList.remove("empty");
     elements.outputStage.classList.add("empty");
@@ -180,7 +189,7 @@ function resetControls() {
   elements.quality.value = 82;
   elements.maxWidth.value = 1600;
   elements.format.value = "image/webp";
-  elements.dropShadow.checked = false;
+  elements.dropShadow.checked = true;
   elements.qualityOutput.textContent = "82%";
   syncDropShadow();
   drawStyledImage();
@@ -188,6 +197,21 @@ function resetControls() {
 
 elements.imageInput.addEventListener("change", (event) => {
   loadFile(event.target.files?.[0]);
+});
+
+elements.dropZone.addEventListener("dragover", (event) => {
+  event.preventDefault();
+  elements.dropZone.classList.add("is-dragging");
+});
+
+elements.dropZone.addEventListener("dragleave", () => {
+  elements.dropZone.classList.remove("is-dragging");
+});
+
+elements.dropZone.addEventListener("drop", (event) => {
+  event.preventDefault();
+  elements.dropZone.classList.remove("is-dragging");
+  loadFile(event.dataTransfer.files?.[0]);
 });
 
 [
