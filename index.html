@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="BNG Image Styler compresses uploaded images and adds custom bezel corners in the browser.">
+    <title>BNG Image Styler</title>
+    <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Asap:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="tool-panel" aria-label="Image controls">
+        <div class="brand">
+          <img src="assets/icon.svg" alt="" class="brand-icon">
+          <div>
+            <p class="eyebrow">Browser canvas tool</p>
+            <h1>BNG Image Styler</h1>
+          </div>
+        </div>
+
+        <label class="drop-zone" for="imageInput">
+          <input id="imageInput" type="file" accept="image/*">
+          <span class="drop-icon" aria-hidden="true">+</span>
+          <span class="drop-title">Upload image</span>
+          <span class="drop-meta">PNG, JPEG, WebP, SVG, GIF</span>
+        </label>
+
+        <div class="controls">
+          <fieldset>
+            <legend>Bezel corners</legend>
+            <div class="corner-grid">
+              <label>
+                <span>Top left</span>
+                <input id="radiusTopLeft" type="number" min="0" max="600" value="80" inputmode="numeric">
+              </label>
+              <label>
+                <span>Top right</span>
+                <input id="radiusTopRight" type="number" min="0" max="600" value="20" inputmode="numeric">
+              </label>
+              <label>
+                <span>Bottom left</span>
+                <input id="radiusBottomLeft" type="number" min="0" max="600" value="20" inputmode="numeric">
+              </label>
+              <label>
+                <span>Bottom right</span>
+                <input id="radiusBottomRight" type="number" min="0" max="600" value="80" inputmode="numeric">
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Compression</legend>
+            <label class="range-field">
+              <span>Quality <output id="qualityOutput" for="quality">82%</output></span>
+              <input id="quality" type="range" min="30" max="100" value="82">
+            </label>
+            <label>
+              <span>Max width</span>
+              <input id="maxWidth" type="number" min="160" max="6000" value="1600" step="20" inputmode="numeric">
+            </label>
+            <label>
+              <span>Output</span>
+              <select id="format">
+                <option value="image/webp">WebP</option>
+                <option value="image/jpeg">JPEG</option>
+                <option value="image/png">PNG</option>
+              </select>
+            </label>
+          </fieldset>
+        </div>
+
+        <div class="actions">
+          <button id="resetButton" type="button">Reset</button>
+          <a id="downloadButton" class="download-button is-disabled" aria-disabled="true" download="bng-image-styler.webp">Download</a>
+        </div>
+      </section>
+
+      <section class="preview-panel" aria-label="Image previews">
+        <div class="preview-card">
+          <div class="preview-heading">
+            <h2>Uploaded</h2>
+            <span id="sourceMeta">No image yet</span>
+          </div>
+          <div class="image-stage empty" id="sourceStage">
+            <img id="sourcePreview" alt="Uploaded preview">
+            <p>Choose an image to start</p>
+          </div>
+        </div>
+
+        <div class="preview-card">
+          <div class="preview-heading">
+            <h2>Generated</h2>
+            <span id="outputMeta">Waiting</span>
+          </div>
+          <div class="image-stage empty generated-stage" id="outputStage">
+            <img id="outputPreview" alt="Generated preview">
+            <p>Your styled image appears here</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <canvas id="workCanvas" hidden></canvas>
+    <script src="app.js"></script>
+  </body>
+</html>
